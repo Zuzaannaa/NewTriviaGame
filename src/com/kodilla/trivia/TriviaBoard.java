@@ -23,7 +23,7 @@ public class TriviaBoard extends Application {
 
     DiceRoll roll;
 
-    public static Label diceRollResult;
+    public static Label diceRollResult = new Label();
 
     public static final int tileSize = 80;
     public static final int columns = 10;
@@ -63,6 +63,8 @@ public class TriviaBoard extends Application {
         Pane board = new Pane();
         board.setPrefSize(200 + (rows * tileSize), columns * tileSize);
         board.getChildren().addAll(tileBoard);
+        board.getChildren().add(diceRollResult);
+
 
         Color aquamarine = Color.AQUAMARINE;
         Color blue = Color.BLUE;
@@ -74,16 +76,13 @@ public class TriviaBoard extends Application {
         colors.add(green);
         colors.add(pink);
 
-        for(int i = 0; i < columns; i ++ ){
-            for(int n = 0; n < rows; n ++){
+        for(int i = 0; i < columns; i ++ ) {
+            for (int n = 0; n < rows; n++) {
                 Tile tile = new Tile();
                 tile.setTranslateX(n * tileSize);
                 tile.setTranslateY((i * tileSize));
-                if((n + i) % 2 == 0){
-                    tile.setFill(aquamarine);
-                }else{
-                    tile.setFill(pink);
-                }
+                int index = (n + i) % 4;
+                tile.setFill(colors.get(index));
                 tileBoard.getChildren().add(tile);
 
             }
@@ -100,14 +99,12 @@ public class TriviaBoard extends Application {
         per.setTranslateY(personPlayerYPosition);
 
         //adding computer player figure to the board
-
         computerPlayer = new Image("file:src/resources/owl2.png");
         ImageView com = new ImageView(computerPlayer);
         com.setFitWidth(30);
         com.setFitHeight(40);
         com.setTranslateX(computerPlayerXPosition);
         com.setTranslateY(computerPlayerYPosition);
-
 
         Button startTheGame = new Button("Start the game");
         startTheGame.setTranslateX(860);
@@ -144,15 +141,17 @@ public class TriviaBoard extends Application {
                         roll = new DiceRoll();
                         roll.roll();
                         int result = roll.getDie();
-                        diceRollResult = new Label();
+                        //diceRollResult = new Label();
                         diceRollResult.setTranslateX(890);
                         diceRollResult.setTranslateY(300);
                         diceRollResult.setText(String.valueOf(result));
+                        board.requestLayout();
 
-                        board.getChildren().add(diceRollResult);
+
+                       // board.getChildren().add(diceRollResult);
 
                         movePlayer();
-                        setPlayerPosition1(personPlayerXPosition, personPlayerYPosition, personPlayer);
+                        setPlayerPosition1(personPlayerXPosition, personPlayerYPosition, per);
                         personTurn = true;
                         start = true;
 
@@ -224,8 +223,9 @@ public class TriviaBoard extends Application {
         }
     }
 
-    private void setPlayerPosition1(int x, int y, Image player){
+    private void setPlayerPosition1(int x, int y, ImageView player){
         TranslateTransition animate = new TranslateTransition(Duration.millis(1000));
+        animate.setNode(player);
         animate.setToX(x);
         animate.setToY(y);
         animate.setAutoReverse(false);
