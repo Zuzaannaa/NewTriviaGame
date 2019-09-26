@@ -1,5 +1,6 @@
 package com.kodilla.trivia;
 
+import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -11,8 +12,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,13 +39,16 @@ public class TriviaBoard extends Application {
     public int playerPosition2 = 1;
 
     public boolean personTurn = true;
-    public boolean computerTurn = false;
+    public boolean computerTurn = true;
 
     public static int personPlayerXPosition = 10;
     public static int personPlayerYPosition = 740;
 
     public static int computerPlayerXPosition = 40;
     public static int computerPlayerYPosition = 740;
+
+    public int owl1Position;
+    public int owl2Position;
 
     public boolean start = true;
     public boolean finish = false;
@@ -147,6 +151,11 @@ public class TriviaBoard extends Application {
 
                         board.getChildren().add(diceRollResult);
 
+                        movePlayer();
+                        setPlayerPosition1(personPlayerXPosition, personPlayerYPosition, personPlayer);
+                        personTurn = true;
+                        start = true;
+
 
 
                     }
@@ -167,6 +176,15 @@ public class TriviaBoard extends Application {
             public void handle(ActionEvent event) {
                 if(start){
                     if(computerTurn){
+                        roll = new DiceRoll();
+                        roll.roll();
+                        int result = roll.getDie();
+                        diceRollResult = new Label();
+                        diceRollResult.setTranslateX(890);
+                        diceRollResult.setTranslateY(300);
+                        diceRollResult.setText(String.valueOf(result));
+
+                        board.getChildren().add(diceRollResult);
 
                     }
                 }
@@ -179,6 +197,39 @@ public class TriviaBoard extends Application {
 
 
         return board;
+    }
+
+    private void movePlayer(){
+        for(int i = 0; i < roll.getDie(); i ++){
+            if(owl1Position % 2 == 1){
+                personPlayerXPosition += 80;
+            }
+            if(owl1Position % 2 == 0){
+                personPlayerXPosition -= 80;
+            }
+            if(personPlayerXPosition > 760){
+                personPlayerYPosition -= 80;
+                personPlayerXPosition -=80;
+                owl1Position ++;
+            }
+            if(personPlayerXPosition < 40){
+                personPlayerYPosition -= 80;
+                personPlayerXPosition += 80;
+                owl1Position ++;
+            }
+            if(personPlayerXPosition < 40 || personPlayerYPosition < 40){
+                personPlayerXPosition = 40;
+                personPlayerYPosition = 40;
+            }
+        }
+    }
+
+    private void setPlayerPosition1(int x, int y, Image player){
+        TranslateTransition animate = new TranslateTransition(Duration.millis(1000));
+        animate.setToX(x);
+        animate.setToY(y);
+        animate.setAutoReverse(false);
+        animate.play();
     }
 
 
