@@ -17,6 +17,7 @@ import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 
 public class TriviaBoard extends Application {
@@ -47,10 +48,10 @@ public class TriviaBoard extends Application {
     public static int computerPlayerXPosition = 40;
     public static int computerPlayerYPosition = 740;
 
-    public int owl1Position;
+    public int owl1Position = 1;
     public int owl2Position;
 
-    public boolean start = true;
+    public boolean start = false;
     public boolean finish = false;
 
 
@@ -67,22 +68,27 @@ public class TriviaBoard extends Application {
 
 
         Color aquamarine = Color.AQUAMARINE;
-        Color blue = Color.BLUE;
-        Color green = Color.GREEN;
+        Color blue = Color.LIGHTSTEELBLUE;
+        Color green = Color.BLANCHEDALMOND;
         Color pink = Color.PINK;
+        Color purple = Color.MEDIUMPURPLE;
+        Color red = Color.RED;
         List<Color> colors = new ArrayList();
         colors.add(aquamarine);
         colors.add(blue);
         colors.add(green);
         colors.add(pink);
+        colors.add(purple);
+        colors.add(red);
 
         for(int i = 0; i < columns; i ++ ) {
             for (int n = 0; n < rows; n++) {
                 Tile tile = new Tile();
                 tile.setTranslateX(n * tileSize);
                 tile.setTranslateY((i * tileSize));
-                int index = (n + i) % 4;
-                tile.setFill(colors.get(index));
+                int index = ((n + i) % 6) + 1;
+                Random random = new Random();
+                tile.setFill(colors.get(random.nextInt(index)));
                 tileBoard.getChildren().add(tile);
 
             }
@@ -118,6 +124,8 @@ public class TriviaBoard extends Application {
 
                 computerPlayerXPosition = 40;
                 computerPlayerYPosition = 740;
+
+                start = true;
 
                 per.setTranslateX(personPlayerXPosition);
                 per.setTranslateY(personPlayerYPosition);
@@ -206,19 +214,20 @@ public class TriviaBoard extends Application {
             if(owl1Position % 2 == 0){
                 personPlayerXPosition -= 80;
             }
-            if(personPlayerXPosition > 760){
+            if(personPlayerXPosition > 740){
                 personPlayerYPosition -= 80;
                 personPlayerXPosition -=80;
                 owl1Position ++;
             }
-            if(personPlayerXPosition < 40){
+            if(personPlayerXPosition < 80){
                 personPlayerYPosition -= 80;
                 personPlayerXPosition += 80;
                 owl1Position ++;
             }
-            if(personPlayerXPosition < 40 || personPlayerYPosition < 40){
-                personPlayerXPosition = 40;
-                personPlayerYPosition = 40;
+            if(personPlayerXPosition < 20 || personPlayerYPosition < 20){
+                personPlayerXPosition = 20;
+                personPlayerYPosition = 20;
+                start = false;
             }
         }
     }
