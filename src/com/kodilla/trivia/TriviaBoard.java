@@ -14,8 +14,6 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -23,6 +21,7 @@ import java.util.Random;
 public class TriviaBoard extends Application {
 
     DiceRoll roll;
+    Tile tile;
 
     public static Label diceRollResult = new Label();
 
@@ -39,8 +38,8 @@ public class TriviaBoard extends Application {
     public int playerPosition1 = 1;
     public int playerPosition2 = 1;
 
-    public boolean personTurn = true;
-    public boolean computerTurn = true;
+    public boolean personTurn = false;
+    public boolean computerTurn = false;
 
     public static int personPlayerXPosition = 10;
     public static int personPlayerYPosition = 740;
@@ -49,7 +48,7 @@ public class TriviaBoard extends Application {
     public static int computerPlayerYPosition = 740;
 
     public int owl1Position = 1;
-    public int owl2Position;
+    public int owl2Position = 1;
 
     public boolean start = false;
     public boolean finish = false;
@@ -67,28 +66,15 @@ public class TriviaBoard extends Application {
         board.getChildren().add(diceRollResult);
 
 
-        Color aquamarine = Color.AQUAMARINE;
-        Color blue = Color.LIGHTSTEELBLUE;
-        Color green = Color.BLANCHEDALMOND;
-        Color pink = Color.PINK;
-        Color purple = Color.MEDIUMPURPLE;
-        Color red = Color.RED;
-        List<Color> colors = new ArrayList();
-        colors.add(aquamarine);
-        colors.add(blue);
-        colors.add(green);
-        colors.add(pink);
-        colors.add(purple);
-        colors.add(red);
-
         for(int i = 0; i < columns; i ++ ) {
             for (int n = 0; n < rows; n++) {
-                Tile tile = new Tile();
+                tile = new Tile();
                 tile.setTranslateX(n * tileSize);
                 tile.setTranslateY((i * tileSize));
-                int index = ((n + i) % 6) + 1;
+
+                List<Color> tileColor = tile.color();
                 Random random = new Random();
-                tile.setFill(colors.get(random.nextInt(index)));
+                tile.setFill(tileColor.get(random.nextInt(tileColor.size())));
                 tileBoard.getChildren().add(tile);
 
             }
@@ -126,6 +112,8 @@ public class TriviaBoard extends Application {
                 computerPlayerYPosition = 740;
 
                 start = true;
+                personTurn = true;
+                computerTurn = false;
 
                 per.setTranslateX(personPlayerXPosition);
                 per.setTranslateY(personPlayerYPosition);
@@ -160,7 +148,8 @@ public class TriviaBoard extends Application {
 
                         movePlayer();
                         setPlayerPosition1(personPlayerXPosition, personPlayerYPosition, per);
-                        personTurn = true;
+                        personTurn = false;
+                        computerTurn = true;
                         start = true;
 
 
@@ -190,6 +179,13 @@ public class TriviaBoard extends Application {
                         diceRollResult.setTranslateX(890);
                         diceRollResult.setTranslateY(300);
                         diceRollResult.setText(String.valueOf(result));
+                        board.requestLayout();
+
+                        moveComputer();
+                        setPlayerPosition1(computerPlayerXPosition, computerPlayerYPosition, com);
+                        personTurn = true;
+                        computerTurn = false;
+                        start = true;
 
                         board.getChildren().add(diceRollResult);
 
@@ -230,6 +226,33 @@ public class TriviaBoard extends Application {
                 start = false;
             }
         }
+    }
+
+    private void moveComputer(){
+        for(int i = 0; i < roll.getDie(); i ++){
+            if(owl2Position % 2 == 1){
+                computerPlayerXPosition += 80;
+            }
+            if(owl2Position % 2 == 0){
+                computerPlayerXPosition -= 80;
+            }
+            if(computerPlayerXPosition > 740){
+                computerPlayerYPosition -= 80;
+                computerPlayerXPosition -=80;
+                owl2Position ++;
+            }
+            if(computerPlayerXPosition < 80){
+                computerPlayerYPosition -= 80;
+                computerPlayerXPosition += 80;
+                owl2Position ++;
+            }
+            if(computerPlayerXPosition < 20 || computerPlayerYPosition < 20){
+                computerPlayerXPosition = 20;
+                computerPlayerYPosition = 20;
+                start = false;
+            }
+        }
+
     }
 
     private void setPlayerPosition1(int x, int y, ImageView player){
