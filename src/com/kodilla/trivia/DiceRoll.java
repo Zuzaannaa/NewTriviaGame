@@ -11,11 +11,11 @@ public class DiceRoll {
 
 
     public int getDie() {
-        return die;
-    }
+       return die;
+   }
 
-    @Override
-    public String toString() {
+   @Override
+   public String toString() {
         return "DiceRoll{" +
                 "die=" + die +
                 '}';

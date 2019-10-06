@@ -2,18 +2,17 @@ package com.kodilla.trivia;
 
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class Tile extends Rectangle {
 
-    Color aquamarine = Color.AQUAMARINE;
-    Color blue = Color.LIGHTSTEELBLUE;
-    Color green = Color.BLANCHEDALMOND;
-    Color pink = Color.PINK;
-    Color purple = Color.MEDIUMPURPLE;
-    Color red = Color.RED;
+    private Color aquamarine = Color.AQUAMARINE;
+    private Color blue = Color.LIGHTSTEELBLUE;
+    private Color green = Color.BLANCHEDALMOND;
+    private Color pink = Color.PINK;
+    private Color purple = Color.MEDIUMPURPLE;
+    private Color red = Color.RED;
 
     private List<Color> colors;
 
@@ -41,8 +40,5 @@ public class Tile extends Rectangle {
 
     }
 
-    public List<Color> getColors() {
-        return colors;
-    }
 
 }

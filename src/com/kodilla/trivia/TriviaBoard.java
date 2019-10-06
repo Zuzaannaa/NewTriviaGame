@@ -137,14 +137,14 @@ public class TriviaBoard extends Application {
                         roll = new DiceRoll();
                         roll.roll();
                         int result = roll.getDie();
-                        //diceRollResult = new Label();
+                        diceRollResult = new Label();
                         diceRollResult.setTranslateX(890);
                         diceRollResult.setTranslateY(300);
                         diceRollResult.setText(String.valueOf(result));
                         board.requestLayout();
 
 
-                       // board.getChildren().add(diceRollResult);
+                       board.getChildren().add(diceRollResult);
 
                         movePlayer();
                         setPlayerPosition1(personPlayerXPosition, personPlayerYPosition, per);
