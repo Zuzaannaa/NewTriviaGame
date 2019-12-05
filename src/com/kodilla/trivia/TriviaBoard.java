@@ -7,14 +7,19 @@ import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+
+import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 
@@ -22,10 +27,12 @@ public class TriviaBoard extends Application {
 
     DiceRoll roll;
     Tile tile;
+    QuizzQuestionsReader quiz;
+    QuestionReader questionReader;
+    Question question;
 
     public static Label diceRollResult = new Label();
 
-    public static final int tileSize = 80;
     public static final int columns = 10;
     public static final int rows = 10;
 
@@ -35,8 +42,8 @@ public class TriviaBoard extends Application {
     public Image computerPlayer;
 
 
-    public int playerPosition1 = 1;
-    public int playerPosition2 = 1;
+    public int playerPosition = 1;
+    public int computerPosition = 1;
 
     public boolean personTurn = false;
     public boolean computerTurn = false;
@@ -59,18 +66,18 @@ public class TriviaBoard extends Application {
 
 
     //creates the board of 100 tiles
-    private Pane createBoard(){
+    private Pane createBoard() {
         Pane board = new Pane();
-        board.setPrefSize(200 + (rows * tileSize), columns * tileSize);
+        board.setPrefSize(200 + (rows * Tile.tileSize), columns * Tile.tileSize);
         board.getChildren().addAll(tileBoard);
         board.getChildren().add(diceRollResult);
 
 
-        for(int i = 0; i < columns; i ++ ) {
+        for (int i = 0; i < columns; i++) {
             for (int n = 0; n < rows; n++) {
                 tile = new Tile();
-                tile.setTranslateX(n * tileSize);
-                tile.setTranslateY((i * tileSize));
+                tile.setTranslateX(Tile.tileSize * n);
+                tile.setTranslateY(Tile.tileSize * i);
 
                 List<Color> tileColor = tile.color();
                 Random random = new Random();
@@ -79,6 +86,7 @@ public class TriviaBoard extends Application {
 
             }
         }
+
 
 
 
@@ -97,6 +105,7 @@ public class TriviaBoard extends Application {
         com.setFitHeight(40);
         com.setTranslateX(computerPlayerXPosition);
         com.setTranslateY(computerPlayerYPosition);
+
 
         Button startTheGame = new Button("Start the game");
         startTheGame.setTranslateX(860);
@@ -129,69 +138,161 @@ public class TriviaBoard extends Application {
         Button personButton = new Button("Player");
         personButton.setTranslateX(860);
         personButton.setTranslateY(60);
-        personButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                if(start) {
-                    if (personTurn) {
-                        roll = new DiceRoll();
-                        roll.roll();
-                        int result = roll.getDie();
-                        diceRollResult = new Label();
-                        diceRollResult.setTranslateX(890);
-                        diceRollResult.setTranslateY(300);
-                        diceRollResult.setText(String.valueOf(result));
-                        board.requestLayout();
+        personButton.setOnAction(event -> {
+            if(start) {
+                if (personTurn) {
+                    int totalLines = 0;
+                    File file = new File("/Users/zuz/IdeaProjects/TriviaBoardGame/src/resources/MovieQ.csv");
+                    String line = "";
+                    String splitBy = "/";
+                    String [] splitLine;
 
+                    BufferedReader br = null;
+                    try {
+                        br = new BufferedReader(new FileReader(file));
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                    while (true){
+                            try {
+                                if ((line = br.readLine()) == null) break;
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            splitLine = line.split(splitBy);
 
-                       board.getChildren().add(diceRollResult);
+                            List<String> choices = new ArrayList<>();
+                            choices.add(splitLine[1]);
+                            choices.add(splitLine[2]);
 
-                        movePlayer();
-                        setPlayerPosition1(personPlayerXPosition, personPlayerYPosition, per);
-                        personTurn = false;
-                        computerTurn = true;
-                        start = true;
+                            ChoiceDialog<String> dialog = new ChoiceDialog<>(choices.get(0), choices);
+                            dialog.setHeaderText("Answer The Question!");
+                            dialog.setContentText(splitLine[0]);
+
+                            Optional<String> q = dialog.showAndWait();
+                            q.ifPresent(answer -> System.out.println("Your choice: " + answer));
+
+                            Optional<String> correctAnswer = Optional.of("Pocahontas");
+
+                        if (q.equals(correctAnswer)) {
+                            roll = new DiceRoll();
+                            roll.roll();
+                            int result = roll.getDie();
+                            diceRollResult = new Label();
+                            diceRollResult.setTranslateX(890);
+                            diceRollResult.setTranslateY(300);
+                            diceRollResult.setText(String.valueOf(result));
+                            board.requestLayout();
+                            movePlayer();
+                            setPlayerPosition1(personPlayerXPosition, personPlayerYPosition, per);
+                            System.out.println("correct");
+                            personTurn = false;
+                            computerTurn = true;
+                        } else {
+                            personTurn = false;
+                            computerTurn = true;
+                            start = true;
+                            System.out.println("Wrong answer");
+                        }
 
 
 
                     }
+
+                   // roll = new DiceRoll();
+                    //roll.roll();
+                    //int result = roll.getDie();
+                    //diceRollResult = new Label();
+                    //diceRollResult.setTranslateX(890);
+                    //diceRollResult.setTranslateY(300);
+                    //diceRollResult.setText(String.valueOf(result));
+                    //board.requestLayout();
+
+
+                  // board.getChildren().add(diceRollResult);
+
+                    //movePlayer();
+                    //setPlayerPosition1(personPlayerXPosition, personPlayerYPosition, per);
+                    //personTurn = false;
+                    //computerTurn = true;
+                    //start = true;
+
                 }
-
-
             }
         });
 
 
-        
+
 
         Button computerButton = new Button("Computer");
         computerButton.setTranslateX(860);
         computerButton.setTranslateY(110);
-        computerButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                if(start){
-                    if(computerTurn){
-                        roll = new DiceRoll();
-                        roll.roll();
-                        int result = roll.getDie();
-                        diceRollResult = new Label();
-                        diceRollResult.setTranslateX(890);
-                        diceRollResult.setTranslateY(300);
-                        diceRollResult.setText(String.valueOf(result));
-                        board.requestLayout();
+        computerButton.setOnAction(event -> {
+            if(start){
+                if(computerTurn){
+                    //roll = new DiceRoll();
+                    //roll.roll();
+                    //int result = roll.getDie();
+                    //diceRollResult = new Label();
+                    //diceRollResult.setTranslateX(890);
+                    //diceRollResult.setTranslateY(300);
+                    //diceRollResult.setText(String.valueOf(result));
+                    //board.requestLayout();
 
-                        moveComputer();
-                        setPlayerPosition1(computerPlayerXPosition, computerPlayerYPosition, com);
-                        personTurn = true;
-                        computerTurn = false;
-                        start = true;
+                    List<String> choices = new ArrayList<>();
+                    choices.add("Pocahontas");
+                    choices.add("Merida");
+                    choices.add("Bella");
 
-                        board.getChildren().add(diceRollResult);
+                    ChoiceDialog<String> dialog = new ChoiceDialog<>("Merida", choices);
+                    dialog.setHeaderText("Answer The Question!");
+                    dialog.setContentText("Which Dinsey princess has a racoon as a sidekick?");
+
+                    Optional<String> q = dialog.showAndWait();
+                    q.ifPresent(answer -> System.out.println("Your choice: " + answer));
+
+                    Optional<String> correctAnswer = Optional.of("Pocahontas");
+
+                        if (q.equals(correctAnswer)) {
+                            roll = new DiceRoll();
+                            roll.roll();
+                            int result = roll.getDie();
+                            diceRollResult = new Label();
+                            diceRollResult.setTranslateX(890);
+                            diceRollResult.setTranslateY(300);
+                            diceRollResult.setText(String.valueOf(result));
+                            board.requestLayout();
+                            moveComputer();
+                            setPlayerPosition1(computerPlayerXPosition, computerPlayerYPosition, com);
+                            System.out.println("correct");
+                            computerTurn = false;
+                            personTurn = true;
+                        } else {
+                            computerTurn = false;
+                            personTurn = true;
+                            start = true;
+                            System.out.println("Wrong answer");
+                        }
 
                     }
+
+
+
+                    //moveComputer();
+                    //setPlayerPosition1(computerPlayerXPosition, computerPlayerYPosition, com);
+
+                    //questionReader = new QuestionReader();
+                    //question = new Question(questionReader.questionArr[0], questionReader.questionArr[1], questionReader.questionArr[2], 2);
+                    //String q = question.getQuestion();
+                    //System.out.println(q);
+
+                    //personTurn = true;
+                    //computerTurn = false;
+                    //start = true;
+
+                    //tileBoard.getChildren().add(diceRollResult);
+
                 }
-            }
         });
 
         tileBoard.getChildren().addAll(per, com, startTheGame, personButton, computerButton);

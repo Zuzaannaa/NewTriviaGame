@@ -7,6 +7,8 @@ import java.util.List;
 
 public class Tile extends Rectangle {
 
+    public static final int tileSize = 80;
+
     private Color aquamarine = Color.AQUAMARINE;
     private Color blue = Color.LIGHTSTEELBLUE;
     private Color green = Color.BLANCHEDALMOND;
@@ -18,10 +20,12 @@ public class Tile extends Rectangle {
 
     public Tile() {
 
-        setWidth(TriviaBoard.tileSize);
-        setHeight(TriviaBoard.tileSize);
+        setWidth(tileSize);
+        setHeight(tileSize);
 
         setStroke(Color.BLACK);
+
+        //System.out.println(Color.AQUAMARINE.name());
 
     }
 

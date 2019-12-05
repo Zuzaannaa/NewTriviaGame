@@ -4,20 +4,27 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 public class QuestionReader {
-    private String movieQ = "MovieQ.csv";
+    public String movieQ = "/Users/zuz/IdeaProjects/TriviaBoardGame/src/resources/MovieQ.csv";
     BufferedReader br = null;
     String line = "";
     String csvSplitBy = "/";
-    private String [] question;
+    public String [] questionArr;
+    public List<String> questions = new ArrayList<>();
+    public List<String> choices = new ArrayList<>();
 
-    public String readQuestion() {
+    public void readQuestions() {
         try {
             br = new BufferedReader(new FileReader(movieQ));
             while ((line = br.readLine()) != null) {
-                question = line.split(csvSplitBy);
+                questionArr = line.split(csvSplitBy);
+                //Question question = new Question(questionArr[0], questionArr[1], questionArr[2], Integer.parseInt(questionArr[3]));
+                questions.add(questionArr[0]);
+                choices.add(questionArr[1]);
+                choices.add(questionArr[2]);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -32,7 +39,6 @@ public class QuestionReader {
                 }
             }
         }
-        return question[0] + question[1] + question[2];
 
     }
 
@@ -41,7 +47,7 @@ public class QuestionReader {
         this.br = br;
         this.line = line;
         this.csvSplitBy = csvSplitBy;
-        this.question = question;
+        this.questionArr = question;
     }
 
     public String getMovieQ() {
@@ -60,7 +66,15 @@ public class QuestionReader {
         return csvSplitBy;
     }
 
-    public String[] getQuestion() {
-        return question;
+    public List<String> getQuestions() {
+        return questions;
+    }
+
+    public List<String> getChoices() {
+        return choices;
+    }
+
+    public String[] getQuestionArr() {
+        return questionArr;
     }
 }
