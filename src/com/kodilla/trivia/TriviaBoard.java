@@ -141,7 +141,6 @@ public class TriviaBoard extends Application {
         personButton.setOnAction(event -> {
             if(start) {
                 if (personTurn) {
-                    int totalLines = 0;
                     File file = new File("/Users/zuz/IdeaProjects/TriviaBoardGame/src/resources/MovieQ.csv");
                     String line = "";
                     String splitBy = "/";
