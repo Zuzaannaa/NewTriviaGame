@@ -17,10 +17,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 
 public class TriviaBoard extends Application {
@@ -30,6 +27,7 @@ public class TriviaBoard extends Application {
     QuizzQuestionsReader quiz;
     QuestionReader questionReader;
     Question question;
+    Figures figures;
 
     public static Label diceRollResult = new Label();
 
@@ -37,7 +35,6 @@ public class TriviaBoard extends Application {
     public static final int rows = 10;
 
 
-    //players icons
     public Image personPlayer;
     public Image computerPlayer;
 
@@ -60,10 +57,7 @@ public class TriviaBoard extends Application {
     public boolean start = false;
     public boolean finish = false;
 
-
-
     private Group tileBoard = new Group();
-
 
     //creates the board of 100 tiles
     private Pane createBoard() {
@@ -71,7 +65,6 @@ public class TriviaBoard extends Application {
         board.setPrefSize(200 + (rows * Tile.tileSize), columns * Tile.tileSize);
         board.getChildren().addAll(tileBoard);
         board.getChildren().add(diceRollResult);
-
 
         for (int i = 0; i < columns; i++) {
             for (int n = 0; n < rows; n++) {
@@ -86,9 +79,6 @@ public class TriviaBoard extends Application {
 
             }
         }
-
-
-
 
         //adding person player figure to the board
         personPlayer = new Image("file:src/resources/owl1.png");
@@ -106,14 +96,13 @@ public class TriviaBoard extends Application {
         com.setTranslateX(computerPlayerXPosition);
         com.setTranslateY(computerPlayerYPosition);
 
-
         Button startTheGame = new Button("Start the game");
         startTheGame.setTranslateX(860);
         startTheGame.setTranslateY(10);
         startTheGame.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                startTheGame.setText("Trivia On");
+                startTheGame.setText("Playing...");
                 personPlayerXPosition = 10;
                 personPlayerYPosition =740;
 
@@ -135,45 +124,95 @@ public class TriviaBoard extends Application {
 
 
 
-        Button personButton = new Button("Player");
+        Button personButton = new Button("Player 1");
         personButton.setTranslateX(860);
         personButton.setTranslateY(60);
         personButton.setOnAction(event -> {
             if(start) {
                 if (personTurn) {
                     File file = new File("/Users/zuz/IdeaProjects/TriviaBoardGame/src/resources/MovieQ.csv");
-                    String line = "";
+                    String  line = "";
                     String splitBy = "/";
+                    String splitLineBy = "\n";
                     String [] splitLine;
+                    String[] splitRow;
+
+                    List<Question> all = new ArrayList<>();
+
+                    splitLine = line.split(splitBy);
 
                     BufferedReader br = null;
                     try {
                         br = new BufferedReader(new FileReader(file));
+                        //String [] row;
+                        //for(int i = 0; i < splitLine.length; i ++){
+                          //  all.add(splitLine[0]);
+                            //choices.add(splitLine[1]);
+                            //choices.add(splitLine[2]);
+                            //correctAnswer.add(splitLine[3]);
+                        //}
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
                     while (true){
                             try {
                                 if ((line = br.readLine()) == null) break;
+                                while ((line = br.readLine()) != null) {
+                                        //String [] row;
+                                      //for(int i = 0; i < 4; i ++){
+                                    String [] row = line.split(splitBy);
+                                    Question question = new Question(row[0], row[1], row[2], row[3]);
+                                    all.add(question);
+
+                                    //}
+                                    }
+
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
-                            splitLine = line.split(splitBy);
 
-                            List<String> choices = new ArrayList<>();
-                            choices.add(splitLine[1]);
-                            choices.add(splitLine[2]);
 
-                            ChoiceDialog<String> dialog = new ChoiceDialog<>(choices.get(0), choices);
+                            //splitLine = line.split(splitBy);
+                            //splitRow = line.split(splitLineBy);
+
+                            //List<String> all = new ArrayList<>();
+                            //List<String> choices = new ArrayList<>();
+                            //List<String> correctAnswer = new ArrayList<>();
+                            //int size = splitRow.length;
+                                //try {
+                                  //  while ((line = br.readLine()) != null) {
+                                    //    String [] row;
+                                      //  for(int i = 0; i < 4; i ++){
+                                        //    row = line.split(splitBy);
+                                          //  all.add(row[0]);
+                                           // choices.add(row[1]);
+                                            //choices.add(row[2]);
+                                            //correctAnswer.add(row[3]);
+                                        //}
+                                    //}
+                               // } catch (IOException e) {
+                                 //   e.printStackTrace();
+                                //}
+
+                            //List<String> choices = new ArrayList<>();
+                            //choices.add(splitLine[1]);
+                            //choices.add(splitLine[2]);
+
+                            //String correctAnswer = splitLine[3];
+
+                            int random = (int)(Math.random() * all.size());
+                            Question question = all.get(random);
+
+                            ChoiceDialog<String> dialog = new ChoiceDialog<>(question.answer1, Arrays.asList(question.answer1, question.answer2));
                             dialog.setHeaderText("Answer The Question!");
-                            dialog.setContentText(splitLine[0]);
+
+                            dialog.setContentText(all.get(random).question);
 
                             Optional<String> q = dialog.showAndWait();
                             q.ifPresent(answer -> System.out.println("Your choice: " + answer));
 
-                            Optional<String> correctAnswer = Optional.of("Pocahontas");
 
-                        if (q.equals(correctAnswer)) {
+                        if (q.get().equals(question.correctAnswer)) {
                             roll = new DiceRoll();
                             roll.roll();
                             int result = roll.getDie();
@@ -185,6 +224,8 @@ public class TriviaBoard extends Application {
                             movePlayer();
                             setPlayerPosition1(personPlayerXPosition, personPlayerYPosition, per);
                             System.out.println("correct");
+                            System.out.println(question.correctAnswer);
+                            board.getChildren().add(diceRollResult);
                             personTurn = false;
                             computerTurn = true;
                         } else {
@@ -192,6 +233,7 @@ public class TriviaBoard extends Application {
                             computerTurn = true;
                             start = true;
                             System.out.println("Wrong answer");
+                            System.out.println(question.correctAnswer);
                         }
 
 
@@ -206,9 +248,7 @@ public class TriviaBoard extends Application {
                     //diceRollResult.setTranslateY(300);
                     //diceRollResult.setText(String.valueOf(result));
                     //board.requestLayout();
-
-
-                  // board.getChildren().add(diceRollResult);
+                    //board.getChildren().add(diceRollResult);
 
                     //movePlayer();
                     //setPlayerPosition1(personPlayerXPosition, personPlayerYPosition, per);
@@ -289,14 +329,13 @@ public class TriviaBoard extends Application {
                     //computerTurn = false;
                     //start = true;
 
+                    //board.requestLayout();
                     //tileBoard.getChildren().add(diceRollResult);
 
                 }
         });
 
         tileBoard.getChildren().addAll(per, com, startTheGame, personButton, computerButton);
-
-
 
 
         return board;
@@ -352,7 +391,6 @@ public class TriviaBoard extends Application {
                 start = false;
             }
         }
-
     }
 
     private void setPlayerPosition1(int x, int y, ImageView player){
@@ -364,10 +402,8 @@ public class TriviaBoard extends Application {
         animate.play();
     }
 
-
     public static void main(String[] args){
         launch(args);
-
     }
 
     @Override
@@ -378,8 +414,5 @@ public class TriviaBoard extends Application {
         primaryStage.setTitle("Trivia");
         primaryStage.setScene(scene);
         primaryStage.show();
-
-
-
     }
 }
